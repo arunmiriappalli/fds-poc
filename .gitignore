@@ -1,0 +1,45 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+/app/target
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+/.idea/
+*.iml
+*.ipr
+*.iws
+/.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Others
+.env
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Scripts
+*.sh~
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# Misc
+*.swp
+*.swo
