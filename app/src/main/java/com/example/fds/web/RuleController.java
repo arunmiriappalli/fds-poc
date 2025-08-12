@@ -7,6 +7,7 @@ import com.example.fds.service.RuleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Comparator;
 
 @RestController
 @RequestMapping("/rules")
@@ -21,7 +22,7 @@ public class RuleController {
 
   @GetMapping
   public List<Rule> list() {
-    return repo.findAllEnabledOrdered();
+    return repo.findAll().stream().filter(r -> r.enabled).sorted(Comparator.comparingInt(r -> r.priority)).toList();
   }
 
   @PostMapping
@@ -32,14 +33,15 @@ public class RuleController {
       r.priority = 100;
     if (!r.enabled)
       r.enabled = true;
-    repo.insert(r);
+    r.updatedAt = new java.sql.Timestamp(System.currentTimeMillis());
+    repo.save(r);
     rules.reload();
     return ResponseEntity.ok().build();
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<?> delete(@PathVariable long id) {
-    repo.delete(id);
+    repo.deleteById(id);
     rules.reload();
     return ResponseEntity.ok().build();
   }

@@ -60,9 +60,9 @@ public class TxnController {
         for (Rule r : list) {
             boolean violated = false;
             if (r.type == RuleType.GEO_DISTANCE) {
-                CardRepository.CardLoc loc = cards.findRegLoc(req.card_id);
-                if (loc != null && r.maxKm != null) {
-                    double dkm = Geo.haversineKm(req.lat, req.lon, loc.lat, loc.lon);
+                var card = cards.findByCardId(req.card_id);
+                if (card != null && card.regLat != null && card.regLon != null && r.maxKm != null) {
+                    double dkm = Geo.haversineKm(req.lat, req.lon, card.regLat, card.regLon);
                     details.put("geo_km", dkm);
                     if (dkm > r.maxKm)
                         violated = true;

@@ -1,28 +1,16 @@
 
 package com.example.fds.repo;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.example.fds.model.Card;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CardRepository {
-  private final JdbcTemplate jdbc;
+public interface CardRepository extends JpaRepository<Card, String> {
 
-  public CardRepository(JdbcTemplate jdbc) {
-    this.jdbc = jdbc;
-  }
+  @Query("SELECT c FROM Card c WHERE c.cardId = :cardId")
+  Card findByCardId(@Param("cardId") String cardId);
 
-  public static class CardLoc {
-    public final double lat, lon;
-
-    public CardLoc(double lat, double lon) {
-      this.lat = lat;
-      this.lon = lon;
-    }
-  }
-
-  public CardLoc findRegLoc(String cardId) {
-    return jdbc.query("SELECT reg_lat, reg_lon FROM cards WHERE card_id=?",
-        rs -> rs.next() ? new CardLoc(rs.getDouble(1), rs.getDouble(2)) : null, cardId);
-  }
 }

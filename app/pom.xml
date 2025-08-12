@@ -1,3 +1,15 @@
+<!--
+  This Maven POM file configures a Spring Boot application named "fds-app" with the following features:
+
+  - Uses Java 21 and Spring Boot version 3.5.4.
+  - Manages dependencies via spring-boot-dependencies BOM.
+  - Includes starters for web, data JDBC, JPA, validation, actuator, and Redis.
+  - Integrates PostgreSQL as the database.
+  - Uses Flyway 10 for database migrations, including the PostgreSQL plugin.
+  - Provides testing support with spring-boot-starter-test.
+  - Configures build plugins for Spring Boot packaging and Java compilation.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -8,7 +20,7 @@
   <name>fds-app</name>
   <properties>
     <java.version>21</java.version>
-    <spring-boot.version>3.3.2</spring-boot.version>
+    <spring-boot.version>3.5.4</spring-boot.version>
     <flyway.version>10.20.0</flyway.version>
   </properties>
   <dependencyManagement>
@@ -31,6 +43,11 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jdbc</artifactId>
+    </dependency>
+    <!-- JPA & Hibernate ORM -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -78,6 +95,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring-boot.version}</version>
         <executions>
           <execution>
             <goals>

@@ -17,7 +17,7 @@ public class RuleService {
   public RuleService(RuleRepository repo) {
     this.repo = repo;
     reload();
-    lastWm.set(repo.maxUpdatedAtEpochMs());
+    lastWm.set(tsToEpochMs(repo.maxUpdatedAt()));
   }
 
   public List<Rule> rules() {
@@ -26,7 +26,7 @@ public class RuleService {
 
   @Scheduled(fixedDelay = 2000)
   public void tick() {
-    long wm = repo.maxUpdatedAtEpochMs();
+    long wm = tsToEpochMs(repo.maxUpdatedAt());
     if (wm > lastWm.get()) {
       reload();
       lastWm.set(wm);
@@ -34,6 +34,10 @@ public class RuleService {
   }
 
   public void reload() {
-    cache.set(repo.findAllEnabledOrdered());
+    cache.set(repo.findAll().stream().filter(r -> r.enabled).sorted(Comparator.comparingInt(r -> r.priority)).toList());
+  }
+
+  private long tsToEpochMs(java.sql.Timestamp ts) {
+    return ts == null ? 0L : ts.getTime();
   }
 }
