@@ -1,3 +1,22 @@
+# This docker-compose.yml file defines a multi-service application stack:
+#
+# Services:
+#   1. postgres:
+#      - Uses the official PostgreSQL 16 image.
+#      - Sets up a database named 'fds' with user 'fds' and password 'fds'.
+#      - Exposes port 5432 for database access.
+#      - Includes a healthcheck using 'pg_isready' to ensure the database is ready.
+#
+#   2. redis:
+#      - Uses the official Redis 7 image.
+#      - Exposes port 6379 for Redis access.
+#      - Includes a healthcheck using 'redis-cli ping' to verify Redis availability.
+#
+#   3. app:
+#      - Builds the application from the './app' directory.
+#      - Configures environment variables for connecting to PostgreSQL and Redis.
+#      - Exposes port 8080 for application access.
+#      - Depends on both postgres and redis services, waiting for them to be healthy before starting.
 services:
   postgres:
     image: postgres:16
