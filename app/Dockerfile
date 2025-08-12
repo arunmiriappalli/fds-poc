@@ -6,7 +6,7 @@ WORKDIR /src
 COPY pom.xml .
 COPY src ./src
 # build and list artifacts so you can see the jar in the logs
-RUN mvn -DskipTests package && ls -l target
+RUN mvn -DskipTests package
 
 # ---- Run stage ----
 FROM eclipse-temurin:21-jre

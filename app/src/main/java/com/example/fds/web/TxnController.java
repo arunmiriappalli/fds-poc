@@ -14,7 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.example.fds.model.TxnDecision;
+import com.example.fds.repo.TxnDecisionRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -29,14 +30,14 @@ public class TxnController {
     private final RuleService rules;
     private final RedisWindows redis;
     private final CardRepository cards;
-    private final JdbcTemplate jdbc;
+    private final TxnDecisionRepository txnDecisionRepo;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public TxnController(RuleService rules, RedisWindows redis, CardRepository cards, JdbcTemplate jdbc) {
+    public TxnController(RuleService rules, RedisWindows redis, CardRepository cards, TxnDecisionRepository txnDecisionRepo) {
         this.rules = rules;
         this.redis = redis;
         this.cards = cards;
-        this.jdbc = jdbc;
+        this.txnDecisionRepo = txnDecisionRepo;
     }
 
     @PostMapping("/authorize")
@@ -109,15 +110,16 @@ public class TxnController {
 
     private void writeDecision(TxnRequest req, DecisionResponse dr, Map<String, Object> details) {
         try {
-            String json = "{}";
-            try {
-                json = MAPPER.writeValueAsString(details == null ? Map.of() : details);
-            } catch (Exception ignore) {
-            }
-            jdbc.update(
-                    "INSERT INTO txn_decisions(txn_id, decision, reason, matched_rule_id, details) VALUES (?,?,?,?, ?::jsonb)",
-                    req.txn_id, dr.decision.name(), dr.reason, dr.matched_rule_id, json);
-        } catch (DataAccessException ignored) {
+            com.fasterxml.jackson.databind.JsonNode jsonNode = MAPPER.valueToTree(details == null ? Map.of() : details);
+            TxnDecision td = new TxnDecision();
+            td.txnId = req.txn_id;
+            td.ts = java.sql.Timestamp.from(java.time.Instant.now());
+            td.decision = dr.decision.name();
+            td.reason = dr.reason;
+            td.matchedRuleId = dr.matched_rule_id;
+            td.details = jsonNode;
+            txnDecisionRepo.save(td);
+        } catch (Exception ignored) {
         }
     }
 }
