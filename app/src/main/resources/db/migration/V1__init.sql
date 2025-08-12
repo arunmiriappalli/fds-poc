@@ -1,11 +1,8 @@
-CREATE TABLE IF NOT EXISTS cards (
-  card_id TEXT PRIMARY KEY,
-  reg_lat DOUBLE PRECISION NOT NULL,
-  reg_lon DOUBLE PRECISION NOT NULL
-);
 
 CREATE TABLE IF NOT EXISTS devices (
-  device_id TEXT PRIMARY KEY
+  device_id TEXT PRIMARY KEY,
+  reg_lat DOUBLE PRECISION NOT NULL,
+  reg_lon DOUBLE PRECISION NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS rules (
@@ -33,9 +30,6 @@ CREATE TABLE IF NOT EXISTS txn_decisions (
   details JSONB
 );
 
-INSERT INTO cards(card_id, reg_lat, reg_lon) VALUES
-  ('c123', 12.935, 77.611)
-ON CONFLICT (card_id) DO NOTHING;
-
-INSERT INTO devices(device_id) VALUES ('d42')
+INSERT INTO devices(device_id, reg_lat, reg_lon) VALUES
+  ('d42', 12.935, 77.611)
 ON CONFLICT (device_id) DO NOTHING;

@@ -4,15 +4,15 @@ import com.example.fds.dto.DecisionResponse;
 import com.example.fds.dto.TxnRequest;
 import com.example.fds.model.ActionEntity;
 import com.example.fds.model.Decision;
+import com.example.fds.model.Device;
 import com.example.fds.model.Rule;
 import com.example.fds.model.RuleType;
-import com.example.fds.repo.CardRepository;
+import com.example.fds.repo.DeviceRepository;
 import com.example.fds.service.RedisWindows;
 import com.example.fds.service.RuleService;
 import com.example.fds.util.Geo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import com.example.fds.model.TxnDecision;
 import com.example.fds.repo.TxnDecisionRepository;
@@ -23,20 +23,21 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/transactions")
 public class TxnController {
     private final RuleService rules;
     private final RedisWindows redis;
-    private final CardRepository cards;
+    private final DeviceRepository devices;
     private final TxnDecisionRepository txnDecisionRepo;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public TxnController(RuleService rules, RedisWindows redis, CardRepository cards, TxnDecisionRepository txnDecisionRepo) {
+    public TxnController(RuleService rules, RedisWindows redis, DeviceRepository devices, TxnDecisionRepository txnDecisionRepo) {
         this.rules = rules;
         this.redis = redis;
-        this.cards = cards;
+        this.devices = devices;
         this.txnDecisionRepo = txnDecisionRepo;
     }
 
@@ -61,9 +62,9 @@ public class TxnController {
         for (Rule r : list) {
             boolean violated = false;
             if (r.type == RuleType.GEO_DISTANCE) {
-                var card = cards.findByCardId(req.card_id);
-                if (card != null && card.regLat != null && card.regLon != null && r.maxKm != null) {
-                    double dkm = Geo.haversineKm(req.lat, req.lon, card.regLat, card.regLon);
+                Optional<Device> device = devices.findById(req.device_id);
+                if (device.isPresent() && device.get().regLat != null && device.get().regLon != null && r.maxKm != null) {
+                    double dkm = Geo.haversineKm(req.lat, req.lon, device.get().regLat, device.get().regLon);
                     details.put("geo_km", dkm);
                     if (dkm > r.maxKm)
                         violated = true;
